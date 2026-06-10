@@ -9,7 +9,7 @@
 │  │  Temp sensor│           │  Cortex-M3 MCU                               ││
 │  └─────────────┘           │                                              ││
 │                            │  ┌──────────────────────────────────────┐   ││
-│  ┌─────────────┐    I2C    │  │  embedded/                           │   ││
+│  ┌─────────────┐    I2C    │  │  embedded/          ** THIS EXERCISE **│   ││
 │  │  HDC3020    │──────────▶│  │                                      │   ││
 │  │  Hum sensor │           │  │  sensor_read() → WeatherPacket       │   ││
 │  └─────────────┘           │  │  weather_packet_serialize() → 11 B   │   ││
@@ -28,7 +28,7 @@
                 ─────────────────────────────┬─────────────────────────────
                                              │
                           ┌──────────────────▼──────────────────┐
-                          │  infrastructure/                     │
+                          │  infrastructure/    ** THIS EXERCISE **│
                           │                                      │
                           │  IoT Topic Rule                      │
                           │  Topic: weather-stations/+/data      │
@@ -36,7 +36,7 @@
                           └──────────────────┬──────────────────┘
                                              │ invoke
                           ┌──────────────────▼──────────────────┐
-                          │  lambda/ingest.py                    │
+                          │  lambda/ingest.py   ** THIS EXERCISE **│
                           │                                      │
                           │  1. base64-decode MQTT payload       │
                           │  2. struct.unpack (11 bytes)         │
@@ -45,7 +45,7 @@
                           └──────────────────┬──────────────────┘
                                              │
                           ┌──────────────────▼──────────────────┐
-                          │  DynamoDB table                      │
+                          │  DynamoDB table     ** THIS EXERCISE **│
                           │                                      │
                           │  PK: device_id (N)                   │
                           │  SK: timestamp  (N)                  │
@@ -53,14 +53,14 @@
                           └──────────────────┬──────────────────┘
                                              │ Query
                           ┌──────────────────▼──────────────────┐
-                          │  lambda/query.py                     │
-                          │  API Gateway (HTTP)                   │
+                          │  lambda/query.py    ** THIS EXERCISE **│
+                          │  API Gateway (HTTP) ** THIS EXERCISE **│
                           │                                      │
                           │  GET /readings?device_id=N&limit=N   │
                           └──────────────────┬──────────────────┘
                                              │ HTTPS
                           ┌──────────────────▼──────────────────┐
-                          │  frontend/                           │
+                          │  frontend/          ** THIS EXERCISE **│
                           │                                      │
                           │  React + TypeScript (Vite)           │
                           │  - Device selector                   │
