@@ -12,13 +12,6 @@ terraform {
     }
   }
 
-  # Populated at init time via: terraform init -backend-config=backend.dev.hcl
-  # Run stage0 and stage1 first.
-  backend "s3" {
-    bucket       = "weather-station-392833766849-tfstate"
-    key          = "dev/stage2/terraform.tfstate"
-    region       = "eu-central-1"
-    use_lockfile = true
-    encrypt      = true
-  }
+  # Populated at init time by deploy.py via -backend-config=backend.<env>.hcl
+  backend "s3" {}
 }

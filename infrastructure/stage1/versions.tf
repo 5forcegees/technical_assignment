@@ -12,13 +12,6 @@ terraform {
     }
   }
 
-  # Populated at init time via: terraform init -backend-config=backend.dev.hcl
-  # Run stage0 first to create the bucket, then copy backend_config output here.
-  backend "s3" {
-    bucket       = "weather-station-392833766849-tfstate"
-    key          = "dev/stage1/terraform.tfstate"
-    region       = "eu-central-1"
-    use_lockfile = true
-    encrypt      = true
-  }
+  # Populated at init time by deploy.py via -backend-config=backend.<env>.hcl
+  backend "s3" {}
 }
