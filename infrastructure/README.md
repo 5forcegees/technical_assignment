@@ -123,13 +123,13 @@ terraform plan
 terraform apply
 ```
 
-Note the output bucket name — you will need it for the `-backend-config` flag in stages 1 and 2.
+Note the output bucket name — replace `<ACCOUNT_ID>` in `stage1/backend.dev.hcl` and `stage2/backend.dev.hcl` with that value.
 
 ### Deploy Stage1
 
 ```bash
 cd infrastructure/stage1
-terraform init -backend-config=../stage0/backend.hcl
+terraform init -backend-config=backend.dev.hcl
 terraform plan -var="environment=dev"
 terraform apply -var="environment=dev"
 ```
@@ -138,7 +138,7 @@ terraform apply -var="environment=dev"
 
 ```bash
 cd infrastructure/stage2
-terraform init -backend-config=../stage0/backend.hcl
+terraform init -backend-config=backend.dev.hcl
 terraform plan -var="environment=dev"
 terraform apply -var="environment=dev"
 ```
