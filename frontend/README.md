@@ -104,6 +104,8 @@ Tests use **Vitest** as the test runner and **Mock Service Worker (MSW)** to int
 **`src/App.test.tsx`** — component tests:
 - Renders the readings table after a successful fetch
 - Displays the latest reading in the summary card
+- Summary card shows the most recent reading when multiple readings are returned
+- Timestamps are formatted using seconds-to-milliseconds conversion
 - Shows an error message when the API returns a non-2xx status
 - Shows the empty state when the API returns an empty readings array
 - Shows "Unknown error" when a non-Error value is thrown
@@ -146,7 +148,7 @@ Expected output:
 
 ```
  Test Files  2 passed (2)
-      Tests  12 passed (12)
+      Tests  14 passed (14)
 ```
 
 ### Watch mode (during development)
@@ -156,6 +158,14 @@ npm run test:watch
 ```
 
 Reruns affected tests on file save.
+
+### Run mutation tests
+
+```bash
+npx stryker run
+```
+
+Stryker mutates `src/**/*.ts` and `src/**/*.tsx` and runs the Vitest suite against each mutant. Configuration is in `stryker.config.mjs`. An HTML report is written to `reports/mutation/index.html`.
 
 ### Coverage report
 

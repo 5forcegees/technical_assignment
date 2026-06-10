@@ -128,7 +128,7 @@ These tests use `moto` to mock DynamoDB in-process — no AWS credentials or net
 tests/test_ingest.py::TestCrc::test_known_value PASSED
 tests/test_ingest.py::TestDecodePacket::test_round_trip PASSED
 ...
-33 passed in 0.6s
+37 passed in 0.4s
 ```
 
 ### Run with coverage
@@ -136,6 +136,16 @@ tests/test_ingest.py::TestDecodePacket::test_round_trip PASSED
 ```bash
 pytest tests/test_ingest.py tests/test_query.py --cov=src --cov-report=term-missing
 ```
+
+### Run mutation tests
+
+```bash
+pip install mutmut
+mutmut run
+mutmut results
+```
+
+Mutmut mutates `src/` and runs the unit test suite against each mutant. Configuration is in `setup.cfg`. An HTML report can be generated with `mutmut html`.
 
 ### Run the live integration tests
 
