@@ -4,6 +4,8 @@ Firmware logic for the farm weather station. Reads temperature and humidity sens
 
 This directory contains pure C logic with no hardware dependencies. Sensor I/O and MQTT are accessed through a HAL (hardware abstraction layer); the production drivers are swapped in at link time. All code here can be built and tested on a host machine without physical hardware.
 
+> **Note:** The tests in this directory run on the host using mock sensor and MQTT implementations. Hardware testing and validation against the real LM92, HDC3020, and target MCU are required before any real-world deployment.
+
 ---
 
 ## Hardware Context
