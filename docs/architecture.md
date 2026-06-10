@@ -9,7 +9,7 @@
 │  │  Temp sensor│           │  Cortex-M3 MCU                               ││
 │  └─────────────┘           │                                              ││
 │                            │  ┌──────────────────────────────────────┐   ││
-│  ┌─────────────┐    I2C    │  │  ** DELIVERED: embedded/          ** │   ││
+│  ┌─────────────┐    I2C    │  │  embedded/                           │   ││
 │  │  HDC3020    │──────────▶│  │                                      │   ││
 │  │  Hum sensor │           │  │  sensor_read() → WeatherPacket       │   ││
 │  └─────────────┘           │  │  weather_packet_serialize() → 11 B   │   ││
@@ -28,7 +28,7 @@
                 ─────────────────────────────┬─────────────────────────────
                                              │
                           ┌──────────────────▼──────────────────┐
-                          │  ** DELIVERED: infrastructure/    ** │
+                          │  infrastructure/                     │
                           │                                      │
                           │  IoT Topic Rule                      │
                           │  Topic: weather-stations/+/data      │
@@ -36,7 +36,7 @@
                           └──────────────────┬──────────────────┘
                                              │ invoke
                           ┌──────────────────▼──────────────────┐
-                          │  ** DELIVERED: lambda/ingest.py   ** │
+                          │  lambda/ingest.py                    │
                           │                                      │
                           │  1. base64-decode MQTT payload       │
                           │  2. struct.unpack (11 bytes)         │
@@ -45,7 +45,7 @@
                           └──────────────────┬──────────────────┘
                                              │
                           ┌──────────────────▼──────────────────┐
-                          │  ** DELIVERED: DynamoDB table     ** │
+                          │  DynamoDB table                      │
                           │                                      │
                           │  PK: device_id (N)                   │
                           │  SK: timestamp  (N)                  │
@@ -53,14 +53,14 @@
                           └──────────────────┬──────────────────┘
                                              │ Query
                           ┌──────────────────▼──────────────────┐
-                          │  ** DELIVERED: lambda/query.py    ** │
-                          │  ** DELIVERED: API Gateway (HTTP) ** │
+                          │  lambda/query.py                     │
+                          │  API Gateway (HTTP)                   │
                           │                                      │
                           │  GET /readings?device_id=N&limit=N   │
                           └──────────────────┬──────────────────┘
                                              │ HTTPS
                           ┌──────────────────▼──────────────────┐
-                          │  ** DELIVERED: frontend/          ** │
+                          │  frontend/                           │
                           │                                      │
                           │  React + TypeScript (Vite)           │
                           │  - Device selector                   │
