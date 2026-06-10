@@ -50,7 +50,7 @@ build/Makefile           GCC fallback (used by CI and pre-built binaries)
 
 ## Data Formats
 
-### WeatherPacket — 13 bytes (MQTT payload)
+### WeatherPacket — 11 bytes (MQTT payload)
 
 ```
 Byte  0    : version     uint8    protocol version (currently 2)
@@ -153,7 +153,7 @@ Expected output:
 
 ```
 === weather_packet tests ===
-  PASS  packet is exactly 13 bytes
+  PASS  packet is exactly 11 bytes
   ...
 17 passed, 0 failed
 

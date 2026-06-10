@@ -10,7 +10,7 @@ Two Python 3.12 Lambda functions forming the cloud data pipeline: one ingests bi
 
 **Trigger:** AWS IoT Core topic rule, invoked per MQTT message on `weather-stations/+/data`.
 
-**Responsibility:** Decode the 13-byte binary `WeatherPacket`, independently validate its CRC-16/CCITT checksum, and write the decoded fields to DynamoDB.
+**Responsibility:** Decode the 11-byte binary `WeatherPacket`, independently validate its CRC-16/CCITT checksum, and write the decoded fields to DynamoDB.
 
 **Response codes:**
 
