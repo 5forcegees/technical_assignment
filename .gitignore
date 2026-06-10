@@ -31,6 +31,10 @@ frontend/dist/
 frontend/.env
 frontend/.env.local
 frontend/coverage/
+frontend/reports/
+
+# Mutation testing output
+lambda/mutants/
 
 # OS
 .DS_Store
