@@ -54,8 +54,10 @@ deploy.py        Terraform lifecycle wrapper (init/plan/apply/destroy for all st
 | Layer | Tool | Count | Coverage |
 |---|---|---|---|
 | Embedded | C test runner | 37 | Packet round-trip, CRC, struct sizes, buffer fill/overwrite/wrap/order |
-| Lambda | pytest + moto | 33 | Decode, CRC validation, DynamoDB write, query parameters, ingest→query round-trip |
-| Frontend | Vitest + MSW | 12 | API client, component render, error states, polling, device switching |
+| Lambda | pytest + moto | 37 | Decode, CRC validation, DynamoDB write, query parameters, ingest→query round-trip |
+| Lambda | mutmut | — | Mutation testing — logic faults in CRC, packet decode, query range, TTL |
+| Frontend | Vitest + MSW | 14 | API client, component render, error states, polling, device switching |
+| Frontend | Stryker | — | Mutation testing — logic faults in timestamp conversion, latest-reading selection |
 
 ---
 
