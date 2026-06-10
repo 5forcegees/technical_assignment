@@ -14,10 +14,10 @@ output "dynamodb_table_name" {
 }
 
 output "backend_config" {
-  description = "Copy this into stage1/backend.dev.hcl, then run: cd ../stage1 && terraform init -backend-config=backend.dev.hcl"
+  description = "Backend config generated automatically by deploy.py; shown here for reference"
   value       = <<-EOT
     bucket       = "${aws_s3_bucket.tfstate.bucket}"
-    key          = "dev/stage1/terraform.tfstate"
+    key          = "<env>/stage<n>/terraform.tfstate"
     region       = "eu-central-1"
     use_lockfile = true
     encrypt      = true
