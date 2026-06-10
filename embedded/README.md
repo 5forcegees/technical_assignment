@@ -110,25 +110,17 @@ The mock implementations are linked in the `weather_station` simulator binary an
 ### Prerequisites
 
 - GCC (any version supporting C11) or a Cortex-M3 cross-compiler
-- CMake ≥ 3.16 (optional — a plain Makefile is also provided)
 
-### Build with CMake
+### Build
 
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+make -f build/Makefile all
 ```
 
 Produces:
 - `build/weather_station` — host simulator (mock sensor + mock MQTT)
 - `build/test_weather_packet` — packet test binary
 - `build/test_circular_buffer` — buffer test binary
-
-### Build with Make (no CMake)
-
-```bash
-make -C build all
-```
 
 ### Run the simulator
 
@@ -141,12 +133,7 @@ Prints one line per reading to stdout and logs MQTT publishes. Press Ctrl-C to s
 ### Run the tests
 
 ```bash
-# via CMake
-ctest --test-dir build --output-on-failure
-
-# or run binaries directly
-./build/test_weather_packet
-./build/test_circular_buffer
+make -f build/Makefile test
 ```
 
 Expected output:
@@ -168,20 +155,17 @@ Expected output:
 The build is configured with `-Wall -Wextra -Wpedantic`. A clean build produces no warnings. To verify:
 
 ```bash
-cmake -S . -B build 2>&1 | grep -i warning
-cmake --build build 2>&1 | grep -i warning
+make -f build/Makefile all 2>&1 | grep -i warning
 ```
 
 ### Cross-compile for Cortex-M3
 
-Replace the compiler in the CMake invocation with an ARM cross-compiler and add the target flags:
+Override `CC` and `CFLAGS` to target Cortex-M3:
 
 ```bash
-cmake -S . -B build-arm \
-  -DCMAKE_C_COMPILER=arm-none-eabi-gcc \
-  -DCMAKE_C_FLAGS="-mcpu=cortex-m3 -mthumb -Os" \
-  -DCMAKE_BUILD_TYPE=Release
-cmake --build build-arm --target weather_station
+make -f build/Makefile all \
+  CC=arm-none-eabi-gcc \
+  CFLAGS="-std=c11 -Wall -Wextra -Wpedantic -Iinclude -mcpu=cortex-m3 -mthumb -Os"
 ```
 
-The `weather_core` static library (`crc.c`, `weather_packet.c`, `circular_buffer.c`) has no OS or libc dependencies beyond `<stdint.h>`, `<stdbool.h>`, and `<string.h>`, and will cross-compile cleanly. `main.c` uses `<time.h>` and `nanosleep` which are POSIX — these would be replaced with RTOS equivalents in a production port.
+The core library (`crc.c`, `weather_packet.c`, `circular_buffer.c`) has no OS or libc dependencies beyond `<stdint.h>`, `<stdbool.h>`, and `<string.h>`, and will cross-compile cleanly. `main.c` uses `<time.h>` and `nanosleep` which are POSIX — these would be replaced with RTOS equivalents in a production port.

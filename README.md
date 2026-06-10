@@ -63,14 +63,7 @@ Temperature and humidity are stored as whole integers. The LM92 has ±0.33 °C t
 
 ```bash
 cd embedded
-cmake -S . -B build && cmake --build build
-ctest --test-dir build
-```
-
-Or with the Makefile directly:
-
-```bash
-make -C build test
+make -f build/Makefile test
 ```
 
 ---
