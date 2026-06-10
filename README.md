@@ -42,15 +42,15 @@ The firmware runs on a Cortex-M3 MCU paired with an LM92 temperature sensor and 
 
 **Main loop** (`src/main.c`): every 60 seconds, read both sensors, write the reading to local flash storage, then publish it over MQTT. Data is written to flash first so nothing is lost if the publish fails.
 
-**Binary packet format** (`include/weather_types.h`, `src/weather_packet.c`): each MQTT message is a 13-byte packed struct.
+**Binary packet format** (`include/weather_types.h`, `src/weather_packet.c`): each MQTT message is an 11-byte packed struct.
 
 ```
 Byte  0     : version    (uint8)
 Bytes 1–2   : device_id  (uint16 LE)
 Bytes 3–6   : timestamp  (uint32 LE)  unix epoch, UTC
-Bytes 7–8   : temperature (int16 LE)  whole degrees C
-Bytes 9–10  : humidity   (uint16 LE)  whole % RH
-Bytes 11–12 : CRC-16/CCITT (uint16 LE) over bytes 0–10
+Byte  7     : temperature (int8)       whole degrees C
+Byte  8     : humidity    (uint8)      whole % RH
+Bytes 9–10  : CRC-16/CCITT (uint16 LE) over bytes 0–8
 ```
 
 Temperature and humidity are stored as whole integers. The LM92 has ±0.33 °C typical accuracy and the HDC3020 has ±1.5% RH — sub-degree encoding would imply more precision than the hardware delivers.
