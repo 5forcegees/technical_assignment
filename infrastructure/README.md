@@ -18,12 +18,13 @@ Stages are deployed in order. Stage2 depends on Stage1's DynamoDB table existing
 
 ## Stage0 — Remote State Bootstrap
 
-Creates the S3 bucket used as the Terraform remote backend by stages 1 and 2. Because Stage0 creates the bucket, it cannot use the bucket as its own backend — its state is kept on the local filesystem.
+Creates the S3 bucket used as the Terraform remote backend by stages 1 and 2. Because Stage0 creates the bucket, it cannot use the bucket as its own backend on the first run. `deploy.py` handles this automatically: it applies Stage0 with a temporary local backend, then migrates the state into the newly created S3 bucket. Subsequent runs use the S3 backend normally.
 
-This stage only needs to be applied once. The state file (`stage0/terraform.tfstate`) should be stored securely; it contains the bucket ARN and is needed to destroy or update the bucket.
+This stage only needs to be applied once.
 
 **Resources:**
-- `aws_s3_bucket.terraform_state` — versioned S3 bucket for remote state
+- `aws_s3_bucket.tfstate` — versioned, encrypted S3 bucket for remote state
+- `aws_dynamodb_table.tfstate_lock` — DynamoDB table for state locking
 
 ---
 
@@ -187,11 +188,11 @@ The two environments will use separate DynamoDB tables (`weather-data-dev` and `
 ### Checking deployed resource state
 
 ```bash
-# List all resources managed by a stage
-terraform state list
+# List all resources managed by a stage (run from the stage directory)
+cd infrastructure/stage1 && terraform state list
 
 # Show details of a specific resource
-terraform state show aws_lambda_function.ingest
+cd infrastructure/stage1 && terraform state show aws_lambda_function.ingest
 
 # Verify the Lambda code hash matches the local source
 python3 deploy.py --env dev --stage 1 --action plan 2>&1 | grep source_code_hash
