@@ -58,8 +58,8 @@
 
 ### DynamoDB TTL: 7 days
 **Decision:** Records expire automatically after 7 days.  
-**Why:** Storage cost scales linearly with retention. At 7-day retention, steady-state storage per station is ~12 MB — negligible. Longer retention (365 days) would cost ~$0.20/station/month in storage alone and becomes the dominant cost line at scale. For irrigation decisions, week-old weather data has limited operational value.  
-**Tradeoff:** No historical trend analysis beyond 7 days. If longer retention is needed, the `TTL_OFFSET_S` constant in `ingest.py` and the DynamoDB comment are the only two places to change. A tiered approach (hot DynamoDB + cold S3 archive via DynamoDB Streams) would be the production-scale solution.
+**Why:** 7 days is sufficient for this exercise — the goal is to demonstrate the pipeline, not long-term data retention. Storage cost scales linearly with retention; at 7-day retention, steady-state storage per station is ~12 MB and negligible in cost. For irrigation decisions, week-old weather data has limited operational value anyway.  
+**Tradeoff:** A production system would retain data for months or years to support trend analysis, seasonal comparisons, and audit requirements. The `TTL_OFFSET_S` constant in `ingest.py` is the only place to change the retention period. At longer retention, a tiered approach (hot DynamoDB + cold S3 archive via DynamoDB Streams) would be the production-scale solution.
 
 ### Single ingest Lambda, not fan-out
 **Decision:** One Lambda handles all incoming MQTT messages.  
