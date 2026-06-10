@@ -44,12 +44,12 @@
 ### Stage0 / Stage1 / Stage2 deployment structure
 **Decision:** Three independent Terraform stages with separate state files.  
 **Why:** Stage0 bootstraps the S3 state bucket — it cannot use that bucket as its own backend (chicken-and-egg). Stage1 (IoT + ingest) and Stage2 (API + frontend serving) are separated because the spec defines them as distinct deliverables, and Stage2 can be torn down without affecting the data pipeline. Separate state files mean a Stage2 apply failure cannot corrupt Stage1 state.  
-**Tradeoff:** Three `terraform apply` commands to deploy from scratch. Mitigated by the documented bootstrap sequence in `stage0/versions.tf`.
+**Tradeoff:** Three stages to deploy from scratch. Mitigated by `deploy.py --stage all --action apply`, which handles the bootstrap sequence and all three stages in one command.
 
-### Stage0 state is local, not remote
-**Decision:** Stage0's `terraform.tfstate` is kept on the local filesystem, not in S3.  
-**Why:** Stage0 creates the S3 bucket. There is no remote backend to store its own state in until after it has run. The state file is small (~3 KB) and rarely changes — it only needs to be rerun if the bucket is accidentally deleted.  
-**Tradeoff:** The state file must be stored securely (it contains bucket ARNs). For a team environment, this would be committed to an encrypted secrets store or a pre-existing bucket created manually.
+### Stage0 state is local, then migrated to S3
+**Decision:** Stage0's initial apply uses a local backend; `deploy.py` automatically migrates the state into the newly created S3 bucket before returning.  
+**Why:** Stage0 creates the S3 bucket. There is no remote backend to store its own state in until after it has run. `deploy.py` handles the chicken-and-egg by applying with a temporary local backend override, then running `terraform init -migrate-state` to move the state into S3. Subsequent stage0 applies use the S3 backend normally.  
+**Tradeoff:** The local state file exists briefly during bootstrap and must not be deleted before migration completes. `deploy.py` manages this automatically; manual intervention is only needed if the process is interrupted mid-migration.
 
 ### DynamoDB PAY_PER_REQUEST billing
 **Decision:** On-demand billing rather than provisioned capacity.  
