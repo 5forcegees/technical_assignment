@@ -1,0 +1,45 @@
+# Build artifacts
+embedded/build/
+embedded/build_tmp/
+*.o
+*.a
+*.out
+
+# Terraform
+infrastructure/**/.terraform/
+infrastructure/**/*.tfstate
+infrastructure/**/*.tfstate.backup
+infrastructure/**/terraform.tfvars
+
+# Lambda build output
+lambda/dist/
+
+# Python
+lambda/__pycache__/
+lambda/*.pyc
+lambda/.venv/
+lambda/venv/
+lambda/.coverage
+lambda/coverage.json
+**/__pycache__/
+*.pyc
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/coverage/
+
+# OS
+.DS_Store
+*.swp
+
+# Tools
+.claude/
+
+# spec
+technical_task.txt
+
+# docs
+docs/
