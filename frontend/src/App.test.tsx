@@ -24,6 +24,40 @@ describe('App', () => {
     expect(screen.getByText(/65 %/)).toBeInTheDocument()
   })
 
+  it('summary card shows the most recent reading when multiple are returned', async () => {
+    server.use(
+      http.get(READINGS_URL, () =>
+        HttpResponse.json({
+          device_id: 1,
+          readings: [
+            { device_id: 1, timestamp: 1700000000, temperature_c: 10, humidity_pct: 40 },
+            { device_id: 1, timestamp: 1700000060, temperature_c: 20, humidity_pct: 50 },
+            { device_id: 1, timestamp: 1700000120, temperature_c: 30, humidity_pct: 60 },
+          ],
+        })
+      )
+    )
+    render(<App />)
+    await waitFor(() => expect(screen.getByText(/Latest/)).toBeInTheDocument())
+    expect(screen.getByText(/30 °C/)).toBeInTheDocument()
+    expect(screen.getByText(/60 %/)).toBeInTheDocument()
+  })
+
+  it('formats timestamps using seconds-to-milliseconds conversion', async () => {
+    const ts = 1700000000
+    server.use(
+      http.get(READINGS_URL, () =>
+        HttpResponse.json({
+          device_id: 1,
+          readings: [{ device_id: 1, timestamp: ts, temperature_c: 21, humidity_pct: 64 }],
+        })
+      )
+    )
+    render(<App />)
+    const expected = new Date(ts * 1000).toLocaleString()
+    await waitFor(() => expect(screen.getAllByText(expected).length).toBeGreaterThan(0))
+  })
+
   it('shows error message when API fails', async () => {
     server.use(
       http.get(READINGS_URL, () => HttpResponse.json({}, { status: 503 }))

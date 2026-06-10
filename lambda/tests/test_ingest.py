@@ -32,6 +32,10 @@ class TestCrc:
         # CRC of empty sequence with init 0xFFFF is 0xFFFF
         assert crc16_ccitt(b"") == 0xFFFF
 
+    def test_known_nonzero_value(self):
+        # Standard CRC-16/CCITT check value for b"123456789" is 0x29B1
+        assert crc16_ccitt(b"123456789") == 0x29B1
+
     def test_self_consistent(self):
         data = b"\x01\x2A\x00\x00\x19\x46\xA8\x65\x2E\x09\x7B"
         crc1 = crc16_ccitt(data)
@@ -114,11 +118,18 @@ class TestHandler:
         resp = ingest.handler({}, None)
         assert resp["statusCode"] == 400
 
+    def test_aws_iot_data_key_accepted(self):
+        mock_table = MagicMock()
+        with patch.object(ingest, "_get_table", return_value=mock_table):
+            resp = ingest.handler({"awsIotData": self._b64_packet()}, None)
+        assert resp["statusCode"] == 200
+
     def test_corrupt_crc_returns_422(self):
         resp = ingest.handler(
             {"payload": self._b64_packet(corrupt_crc=True)}, None
         )
         assert resp["statusCode"] == 422
+        assert "body" in resp
 
     def test_wrong_length_returns_422(self):
         import base64

@@ -52,6 +52,7 @@ class TestQueryValidation:
     def test_non_integer_device_id_returns_400(self):
         resp = query.handler(_make_event({"device_id": "abc"}), None)
         assert resp["statusCode"] == 400
+        assert "error" in json.loads(resp["body"])
 
     def test_non_integer_start_returns_400(self):
         resp = query.handler(_make_event({"device_id": "1", "start": "bad"}), None)
@@ -99,6 +100,30 @@ class TestQueryDefaultTimeRange:
         mock_table.query.assert_called_once()
         call_kwargs = mock_table.query.call_args[1]
         assert "KeyConditionExpression" in call_kwargs
+
+    def test_default_range_is_exactly_86400_seconds(self):
+        mock_table = MagicMock()
+        mock_table.query.return_value = {"Items": []}
+        fixed_now = 1700000000
+
+        with patch.object(query, "_get_table", return_value=mock_table), \
+             patch("query.time") as mock_time:
+            mock_time.time.return_value = fixed_now
+            query.handler(_make_event({"device_id": "1"}), None)
+
+        # KeyConditionExpression is And(eq, Between); _values = (eq, Between)
+        between = mock_table.query.call_args[1]["KeyConditionExpression"]._values[1]
+        assert between._values[1] == fixed_now - 86400
+        assert between._values[2] == fixed_now
+
+    def test_default_limit_is_100(self):
+        items = [{"device_id": 1, "timestamp": 1700000000 + i,
+                  "temperature": 20, "humidity": 50} for i in range(150)]
+        mock_table = MagicMock()
+        mock_table.query.return_value = {"Items": items}
+        with patch.object(query, "_get_table", return_value=mock_table):
+            resp = query.handler(_make_event({"device_id": "1"}), None)
+        assert len(json.loads(resp["body"])["readings"]) == 100
 
 
 # ---------------------------------------------------------------------------
