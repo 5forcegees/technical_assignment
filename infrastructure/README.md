@@ -111,93 +111,75 @@ stage2/
 ### Prerequisites
 
 - Terraform ≥ 1.5
+- Python 3.9+ with `boto3` (`pip install boto3`)
 - AWS credentials configured (`aws configure` or environment variables)
-- AWS CLI (optional, useful for validation)
 
-### First-time setup (Stage0)
+All Terraform lifecycle operations are managed through `deploy.py` at the repo root. The script resolves your AWS account ID, generates the correct backend config for each stage, and handles the stage-0 bootstrap chicken-and-egg.
+
+### First-time deploy (all stages)
 
 ```bash
-cd infrastructure/stage0
-terraform init
-terraform plan
-terraform apply
+python3 deploy.py --env dev --stage 0   --action apply   # creates S3 state bucket
+python3 deploy.py --env dev --stage 1   --action apply   # IoT Core, Lambda, DynamoDB
+python3 deploy.py --env dev --stage 2   --action apply   # query Lambda, API Gateway
 ```
 
-Note the output bucket name — replace `<ACCOUNT_ID>` in `stage1/backend.dev.hcl` and `stage2/backend.dev.hcl` with that value.
-
-### Deploy Stage1
+Or in one command:
 
 ```bash
-cd infrastructure/stage1
-terraform init -backend-config=backend.dev.hcl
-terraform plan -var="environment=dev"
-terraform apply -var="environment=dev"
-```
-
-### Deploy Stage2
-
-```bash
-cd infrastructure/stage2
-terraform init -backend-config=backend.dev.hcl
-terraform plan -var="environment=dev"
-terraform apply -var="environment=dev"
+python3 deploy.py --env dev --stage all --action apply --auto-approve
 ```
 
 Copy the `api_endpoint` output value into `frontend/.env` as `VITE_API_URL`.
 
-### Validate infrastructure without deploying
+### Plan before applying
 
 ```bash
-# Check syntax and configuration
-terraform validate
+python3 deploy.py --env dev --stage 1 --action plan
+python3 deploy.py --env dev --stage 2 --action plan
+```
 
-# Preview changes without applying
-terraform plan -var="environment=dev"
+### Validate Terraform syntax
 
-# Verify provider versions match the lock file
-terraform providers lock
+```bash
+python3 deploy.py --env dev --stage 1 --action validate
+python3 deploy.py --env dev --stage 2 --action validate
 ```
 
 ### Format check
 
 ```bash
-terraform fmt -check -recursive
+terraform fmt -check -recursive infrastructure/
 ```
 
-To auto-fix formatting:
+To auto-fix:
 
 ```bash
-terraform fmt -recursive
+terraform fmt -recursive infrastructure/
 ```
 
 ### Tear down
 
-Stage2 can be destroyed without affecting Stage1 (and therefore without losing any data):
+Stage2 can be destroyed without affecting Stage1 (no data loss):
 
 ```bash
-cd infrastructure/stage2
-terraform destroy -var="environment=dev"
+python3 deploy.py --env dev --stage 2 --action destroy
 ```
 
-To destroy everything including data:
+To destroy everything:
 
 ```bash
-cd infrastructure/stage1
-terraform destroy -var="environment=dev"
+python3 deploy.py --env dev --stage all --action destroy --auto-approve
 ```
 
-Stage0 (the state bucket) should only be destroyed after both Stage1 and Stage2 are torn down and their state files are no longer needed.
+Stage0 (the state bucket) should only be destroyed after both Stage1 and Stage2 are gone and their state files are no longer needed.
 
 ### Deploying to a second environment
 
-All resources are namespaced by `var.environment`. To deploy a staging environment alongside dev:
+All resources are namespaced by `--env`. To deploy staging alongside dev:
 
 ```bash
-# Stage1
-terraform apply -var="environment=staging"
-
-# Stage2
-terraform apply -var="environment=staging"
+python3 deploy.py --env staging --stage all --action apply
 ```
 
 The two environments will use separate DynamoDB tables (`weather-data-dev` and `weather-data-staging`), separate Lambda functions, and separate API endpoints with no cross-contamination.
